@@ -1,7 +1,27 @@
+#include <Arduino.h>
+#include <LiquidCrystal.h>
+
+#include "Board.hpp"
+#include "Display.hpp"
+
+#define LCD_PIN_RS 12
+#define LCD_PIN_ENABLE 11
+#define LCD_PIN_D4 5
+#define LCD_PIN_D5 4
+#define LCD_PIN_D6 3
+#define LCD_PIN_D7 2
+#define LCD_COLS 16
+#define LCD_ROWS 2
+
+Board board;
+LiquidCrystal lcd(LCD_PIN_RS, LCD_PIN_ENABLE, LCD_PIN_D4, LCD_PIN_D5, LCD_PIN_D6, LCD_PIN_D7);
+Display display(&board, &lcd);
+
 const int BUTTON_PINS[4] = {A5, A4, A3, A2};
 
 void setup() {
     Serial.begin(9600);
+    lcd.begin(LCD_COLS, LCD_ROWS);
     for (int i = 0; i < 4; ++i) {
         pinMode(BUTTON_PINS[i], INPUT);
     }
@@ -17,4 +37,8 @@ void loop() {
     Serial.print(", 4: ");
     Serial.println(digitalRead(A2));
     tone(8, 220);
+    
+    display.render();
+
+    delay(10);
 }
