@@ -18,14 +18,14 @@ Board board;
 LiquidCrystal lcd(LCD_PIN_RS, LCD_PIN_ENABLE, LCD_PIN_D4, LCD_PIN_D5, LCD_PIN_D6, LCD_PIN_D7);
 Display display(&board, &lcd);
 
-const int BUTTON_PINS[4] = {A5, A4, A3, A2};
-
 void setup() {
     Serial.begin(9600);
     lcd.begin(LCD_COLS, LCD_ROWS);
-    for (int i = 0; i < 4; ++i) {
-        pinMode(BUTTON_PINS[i], INPUT);
-    }
+
+    pinMode(BUTTON_A_PIN, INPUT);
+    pinMode(BUTTON_B_PIN, INPUT);
+    pinMode(BUTTON_C_PIN, INPUT);
+    pinMode(BUTTON_D_PIN, INPUT);
 }
 
 void loop() {
