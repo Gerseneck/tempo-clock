@@ -9,12 +9,12 @@
 #include "Game.hpp"
 
 enum BoardState {
-    MENU = 0,
-    WAITING = 1,
-    IN_GAME = 2,
-    PAUSED = 3,
-    BLUE_WIN = 4,
-    RED_WIN = 5,
+    MENU,
+    WAITING,
+    IN_GAME,
+    PAUSED,
+    BLUE_WIN,
+    RED_WIN,
 };
 
 struct ClockTime {
@@ -38,6 +38,21 @@ enum Preset {
     THIRTY_TWENTY,
     THIRTY_TWENTY_D,
     NONE,
+};
+
+const std::map<Preset, std::string> preset_strings = {
+    {ONE_ZERO, "1+0"},
+    {TWO_ZERO, "2+0"},
+    {THREE_ZERO, "3+0"},
+    {THREE_TWO, "3+2"},
+    {FIVE_ZERO, "5+0"},
+    {FIVE_THREE, "5+3"},
+    {TEN_ZERO, "10+0"},
+    {TEN_FIVE, "10+5"},
+    {FIFTEEN_TEN, "15+10"},
+    {THIRTY_ZERO, "30+0"},
+    {THIRTY_TWENTY, "30+20"},
+    {THIRTY_TWENTY_D, "30|20d"},
 };
 
 const std::map<Preset, ClockTime> preset_vals = {
