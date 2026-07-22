@@ -29,17 +29,10 @@ void setup() {
 }
 
 void loop() {
-    Serial.print("1: ");
-    Serial.print(digitalRead(A5));
-    Serial.print(", 2: ");
-    Serial.print(digitalRead(A4));
-    Serial.print(", 3: ");
-    Serial.print(digitalRead(A3));
-    Serial.print(", 4: ");
-    Serial.println(digitalRead(A2));
-    tone(8, 220);
-    
+    // Serial.println(board.get_preset_string());
+    // tone(8, 220);
+    board.event_listener();
     display.render();
 
-    delay(10);
+    delay(100);
 }

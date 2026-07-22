@@ -79,5 +79,27 @@ void Board::set_state(BoardState state) { state = state; }
 void Board::next_preset() { }
 
 void Board::event_listener() {
+    int button_presses[4] = {
+        digitalRead(BUTTON_A_PIN),
+        digitalRead(BUTTON_B_PIN),
+        digitalRead(BUTTON_C_PIN),
+        digitalRead(BUTTON_D_PIN),
+    };
 
+    switch (state) {
+        case MENU:
+            _menu_event_listener(button_presses);
+            break;
+    }
+}
+
+void Board::_menu_event_listener(int* presses) {
+    Serial.print("1: ");
+    Serial.print(presses[0]);
+    Serial.print(", 2: ");
+    Serial.print(presses[1]);
+    Serial.print(", 3: ");
+    Serial.print(presses[2]);
+    Serial.print(", 4: ");
+    Serial.println(presses[3]);
 }

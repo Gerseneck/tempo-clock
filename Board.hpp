@@ -24,7 +24,7 @@ struct ClockTime {
     unsigned long delay;
 };
 
-enum Preset {
+enum Preset : int {
     ONE_ZERO,
     TWO_ZERO,
     THREE_ZERO,
@@ -60,6 +60,8 @@ class Board {
         ClockTime time;
         Preset preset;
         Game game;
+
+        void _menu_event_listener(int* presses);
 };
 
 #endif
