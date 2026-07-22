@@ -1,8 +1,6 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
-#include <map>
-
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 
@@ -10,7 +8,9 @@
 
 enum BoardState {
     MENU,
-    WAITING,
+    CUSTOM_T,
+    CUSTOM_I,
+    CUSTOM_D,
     IN_GAME,
     PAUSED,
     BLUE_WIN,
@@ -51,10 +51,10 @@ class Board {
         void event_listener();
         BoardState get_state();
         ClockTime get_clock_time();
+        arduino::String get_clock_time_string();
         Preset get_preset();
         arduino::String get_preset_string();
         void set_state(BoardState state);
-        void next_preset();
     private:
         BoardState state;
         ClockTime time;
@@ -62,6 +62,9 @@ class Board {
         Game game;
 
         void _menu_event_listener(int* presses);
+        void _next_preset(bool previous);
+        void _start_game();
+        void _toggle_custom_states();
 };
 
 #endif

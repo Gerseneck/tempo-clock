@@ -6,6 +6,7 @@
 Board::Board() {
     state = MENU;
     preset = ONE_ZERO;
+    time = get_clock_time();
 }
 
 BoardState Board::get_state() { return state; }
@@ -74,9 +75,26 @@ ClockTime Board::get_clock_time() {
     }
 }
 
-void Board::set_state(BoardState state) { state = state; }
+arduino::String Board::get_clock_time_string() {
+    return arduino::String((std::to_string(time.time / 60000) + "+" + std::to_string(time.increment / 1000) + "|" + std::to_string(time.delay / 1000) + "d").c_str());
+}
 
-void Board::next_preset() { }
+void Board::_next_preset(bool previous) {
+    int preset_int = static_cast<int>(preset);
+
+    if (previous) {
+        preset_int--;
+
+        if (preset_int < ONE_ZERO) { return; }
+    } else {
+        preset_int++;
+
+        if (preset_int > NONE) { return; }
+    }
+
+    preset = static_cast<Preset>(preset_int);
+    time = get_clock_time();
+}
 
 void Board::event_listener() {
     int button_presses[4] = {
@@ -93,13 +111,46 @@ void Board::event_listener() {
     }
 }
 
+void Board::_start_game() {}
+
+void Board::_toggle_custom_states() {
+    if (preset != NONE) { return; }
+
+    if (state == MENU) {
+        state = CUSTOM_T;
+    } else if (state == CUSTOM_T) {
+        state = CUSTOM_I;
+    } else if (state == CUSTOM_I) {
+        _start_game();
+    } else {
+        state = CUSTOM_T;
+    }
+}
+
 void Board::_menu_event_listener(int* presses) {
-    Serial.print("1: ");
-    Serial.print(presses[0]);
-    Serial.print(", 2: ");
-    Serial.print(presses[1]);
-    Serial.print(", 3: ");
-    Serial.print(presses[2]);
-    Serial.print(", 4: ");
-    Serial.println(presses[3]);
+    if (presses[0]) { 
+        if (state == MENU) {
+            _next_preset(false);
+            return;
+        }
+        // inc time logic for custom
+    };
+    if (presses[1]) {
+        if (preset == NONE) {
+            _toggle_custom_states();
+            return;
+        }
+        _start_game();
+    }
+    if (presses[2]) {}
+    if (presses[3]) {
+        if (state == MENU) {
+            _next_preset(true);
+            return;
+        }
+        // dec time logic for custom
+    };
+
+    Serial.println(get_preset_string());
+    Serial.println(get_clock_time_string());
 }
