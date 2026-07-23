@@ -9,6 +9,8 @@ Board::Board() {
     state = MENU;
     preset = ONE_ZERO;
     time = get_clock_time();
+    last_press = millis();
+    held = false;
 }
 
 BoardState Board::get_state() { return state; }
@@ -107,6 +109,22 @@ void Board::event_listener() {
         digitalRead(BUTTON_D_PIN),
     };
 
+    std::set<int> button_volt(button_presses, button_presses + 4);
+    bool pressed = button_volt.size() > 1;
+
+    if (pressed) {
+        if (millis() - 200 < last_press) { return; }
+
+        if (!held && millis() - 750 < last_press) { return; }
+
+        if (millis() - 2000 > last_press) { held = true; }
+
+        last_press = millis();
+    } else {
+        held = false;
+        last_press = 0;
+    }
+
     switch (state) {
         case MENU:
         case CUSTOM_T:
@@ -168,7 +186,4 @@ void Board::_menu_event_listener(int* presses) {
         }
         _inc_time(true);
     };
-
-    Serial.println(get_preset_string());
-    Serial.println(get_clock_time_string());
 }

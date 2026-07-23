@@ -61,6 +61,9 @@ class Board {
         Preset preset;
         Game game;
 
+        unsigned long last_press;
+        bool held;
+
         void _menu_event_listener(int* presses);
         void _next_preset(bool previous);
         void _start_game();

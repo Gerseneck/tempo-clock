@@ -29,9 +29,11 @@ void setup() {
 }
 
 void loop() {
-    // Serial.println(board.get_preset_string());
-    // tone(8, 220);
     board.event_listener();
+
+    Serial.println(board.get_preset_string());
+    Serial.println(board.get_clock_time_string());
+
     display.render();
 
     delay(100);
