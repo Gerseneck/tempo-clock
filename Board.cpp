@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 
+#include <set>
+
 #include "Board.hpp"
 
 Board::Board() {
@@ -39,7 +41,7 @@ arduino::String Board::get_preset_string() {
             return "30+20";
         case THIRTY_TWENTY_D: 
             return "30|20d";
-        case NONE:
+        case CUSTOM:
             return "Custom";
     };
 }
@@ -70,7 +72,7 @@ ClockTime Board::get_clock_time() {
             return ClockTime{30 * 60 * 1000, 20 * 1000, 0};
         case THIRTY_TWENTY_D: 
             return ClockTime{30 * 60 * 1000, 0, 20 * 1000};
-        case NONE:
+        case CUSTOM:
             return time;
     }
 }
@@ -89,14 +91,15 @@ void Board::_next_preset(bool previous) {
     } else {
         preset_int++;
 
-        if (preset_int > NONE) { return; }
+        if (preset_int > CUSTOM) { return; }
     }
 
     preset = static_cast<Preset>(preset_int);
-    time = get_clock_time();
+    time = preset != CUSTOM ? get_clock_time() : ClockTime{0, 0, 0};
 }
 
 void Board::event_listener() {
+    // TODO: prevent multiple registered input in a short amount of time
     int button_presses[4] = {
         digitalRead(BUTTON_A_PIN),
         digitalRead(BUTTON_B_PIN),
@@ -106,21 +109,36 @@ void Board::event_listener() {
 
     switch (state) {
         case MENU:
+        case CUSTOM_T:
+        case CUSTOM_I:
+        case CUSTOM_D:
             _menu_event_listener(button_presses);
             break;
+    }
+}
+
+void Board::_inc_time(bool dec) {
+    if (state == CUSTOM_T) {
+        time.time += dec ? -60000 : 60000;
+    } else if (state == CUSTOM_I) {
+        time.increment += dec ? -1000 : 1000;
+    } else if (state == CUSTOM_D) {
+        time.delay += dec ? -1000 : 1000;
     }
 }
 
 void Board::_start_game() {}
 
 void Board::_toggle_custom_states() {
-    if (preset != NONE) { return; }
+    if (preset != CUSTOM) { return; }
 
     if (state == MENU) {
         state = CUSTOM_T;
     } else if (state == CUSTOM_T) {
         state = CUSTOM_I;
     } else if (state == CUSTOM_I) {
+        state = CUSTOM_D;
+    } else if (state == CUSTOM_D) {
         _start_game();
     } else {
         state = CUSTOM_T;
@@ -133,10 +151,10 @@ void Board::_menu_event_listener(int* presses) {
             _next_preset(false);
             return;
         }
-        // inc time logic for custom
+        _inc_time(false);
     };
     if (presses[1]) {
-        if (preset == NONE) {
+        if (preset == CUSTOM) {
             _toggle_custom_states();
             return;
         }
@@ -148,7 +166,7 @@ void Board::_menu_event_listener(int* presses) {
             _next_preset(true);
             return;
         }
-        // dec time logic for custom
+        _inc_time(true);
     };
 
     Serial.println(get_preset_string());

@@ -19,9 +19,9 @@ enum BoardState {
 
 struct ClockTime {
     // time in milliseconds
-    unsigned long time;
-    unsigned long increment;
-    unsigned long delay;
+    unsigned int time;
+    unsigned int increment;
+    unsigned int delay;
 };
 
 enum Preset : int {
@@ -37,7 +37,7 @@ enum Preset : int {
     THIRTY_ZERO,
     THIRTY_TWENTY,
     THIRTY_TWENTY_D,
-    NONE,
+    CUSTOM,
 };
 
 const int BUTTON_A_PIN = A5;
@@ -65,6 +65,7 @@ class Board {
         void _next_preset(bool previous);
         void _start_game();
         void _toggle_custom_states();
+        void _inc_time(bool dec);
 };
 
 #endif

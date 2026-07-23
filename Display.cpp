@@ -19,7 +19,7 @@ void Display::render() {
 
 void Display::_render_menu() {
     lcd->setCursor(0, 0);
-    if (board->get_preset() != NONE) {
+    if (board->get_preset() != CUSTOM) {
         lcd->print("Select Mode:");
         lcd->setCursor(0, 1);
         lcd->print(board->get_preset_string());
