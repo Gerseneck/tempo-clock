@@ -4,8 +4,6 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 
-#include "Game.hpp"
-
 enum BoardState {
     MENU,
     CUSTOM_T,
@@ -22,6 +20,13 @@ struct ClockTime {
     unsigned int time;
     unsigned int increment;
     unsigned int delay;
+};
+
+struct Player {
+    unsigned long start_time;
+    unsigned long last_time;
+    bool is_turn;
+    unsigned int turn_number;
 };
 
 enum Preset : int {
@@ -59,7 +64,9 @@ class Board {
         BoardState state;
         ClockTime time;
         Preset preset;
-        Game game;
+
+        Player red;
+        Player blue;
 
         unsigned long last_press;
         bool held;

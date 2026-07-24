@@ -11,6 +11,8 @@ Board::Board() {
     time = get_clock_time();
     last_press = millis();
     held = false;
+    red = Player{0, 0, 0, 0};
+    blue = Player{0, 0, 0, 0};
 }
 
 BoardState Board::get_state() { return state; }
@@ -101,7 +103,6 @@ void Board::_next_preset(bool previous) {
 }
 
 void Board::event_listener() {
-    // TODO: prevent multiple registered input in a short amount of time
     int button_presses[4] = {
         digitalRead(BUTTON_A_PIN),
         digitalRead(BUTTON_B_PIN),
@@ -145,7 +146,13 @@ void Board::_inc_time(bool dec) {
     }
 }
 
-void Board::_start_game() {}
+void Board::_start_game() {
+    state = IN_GAME;
+
+    unsigned long start_time = millis();
+    red.start_time = start_time;
+    blue.start_time = start_time;
+}
 
 void Board::_toggle_custom_states() {
     if (preset != CUSTOM) { return; }
