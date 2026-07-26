@@ -21,6 +21,7 @@ Display display(&board, &lcd);
 void setup() {
     Serial.begin(9600);
     lcd.begin(LCD_COLS, LCD_ROWS);
+    lcd.print("Super!");
 
     pinMode(BUTTON_A_PIN, INPUT);
     pinMode(BUTTON_B_PIN, INPUT);

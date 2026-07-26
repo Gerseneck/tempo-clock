@@ -133,6 +133,13 @@ void Board::event_listener() {
         case CUSTOM_D:
             _menu_event_listener(button_presses);
             break;
+        case IN_GAME:
+            _game_event_listener(button_presses);
+            break;
+        case PAUSED:
+        case BLUE_WIN:
+        case RED_WIN:
+            _win_event_listener(button_presses);
     }
 }
 
@@ -193,4 +200,12 @@ void Board::_menu_event_listener(int* presses) {
         }
         _inc_time(true);
     };
+}
+
+void Board::_win_event_listener(int* presses) {
+    
+}
+
+void Board::_game_event_listener(int* presses) {
+    
 }

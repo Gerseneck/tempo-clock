@@ -72,6 +72,8 @@ class Board {
         bool held;
 
         void _menu_event_listener(int* presses);
+        void _game_event_listener(int* presses);
+        void _win_event_listener(int* presses);
         void _next_preset(bool previous);
         void _start_game();
         void _toggle_custom_states();
