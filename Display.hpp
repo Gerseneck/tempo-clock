@@ -8,11 +8,11 @@
 
 class Display {
     public:
-        Display(Board* board, LiquidCrystal* lcd);
+        Display(Board& board, LiquidCrystal& lcd);
         void render();
     private:
-        Board* board;
-        LiquidCrystal* lcd;
+        Board& board;
+        LiquidCrystal& lcd;
         void _render_menu();
 };
 

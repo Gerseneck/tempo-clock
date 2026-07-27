@@ -192,7 +192,12 @@ void Board::_menu_event_listener(int* presses) {
         }
         _start_game();
     }
-    if (presses[2]) {}
+    if (presses[2]) {
+        if (preset == CUSTOM) {
+            state = MENU;
+            _next_preset(false);
+        }
+    }
     if (presses[3]) {
         if (state == MENU) {
             _next_preset(true);

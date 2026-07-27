@@ -16,12 +16,12 @@ const int LCD_ROWS = 2;
 
 Board board;
 LiquidCrystal lcd(LCD_PIN_RS, LCD_PIN_ENABLE, LCD_PIN_D4, LCD_PIN_D5, LCD_PIN_D6, LCD_PIN_D7);
-Display display(&board, &lcd);
+Display display(board, lcd);
 
 void setup() {
     Serial.begin(9600);
     lcd.begin(LCD_COLS, LCD_ROWS);
-    lcd.print("Super!");
+    lcd.print("Tempo Clock");
 
     pinMode(BUTTON_A_PIN, INPUT);
     pinMode(BUTTON_B_PIN, INPUT);
@@ -31,10 +31,6 @@ void setup() {
 
 void loop() {
     board.event_listener();
-
-    Serial.println(board.get_preset_string());
-    Serial.println(board.get_clock_time_string());
-
     display.render();
 
     delay(100);

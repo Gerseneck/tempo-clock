@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 
-enum BoardState {
+enum BoardState : int {
     MENU,
     CUSTOM_T,
     CUSTOM_I,
@@ -24,7 +24,7 @@ struct ClockTime {
 
 struct Player {
     unsigned long start_time;
-    unsigned long last_time;
+    unsigned long time_left;
     bool is_turn;
     unsigned int turn_number;
 };
