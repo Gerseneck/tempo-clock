@@ -13,6 +13,7 @@ class Display {
     private:
         Board& board;
         LiquidCrystal& lcd;
+        BoardState state;
         void _render_menu();
 };
 

@@ -23,7 +23,6 @@ struct ClockTime {
 };
 
 struct Player {
-    unsigned long start_time;
     unsigned long time_left;
     bool is_turn;
     unsigned int turn_number;
@@ -59,6 +58,7 @@ class Board {
         arduino::String get_clock_time_string();
         Preset get_preset();
         arduino::String get_preset_string();
+        arduino::String get_player_time(Player p);
         void set_state(BoardState state);
     private:
         BoardState state;

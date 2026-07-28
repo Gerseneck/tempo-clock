@@ -11,8 +11,8 @@ Board::Board() {
     time = get_clock_time();
     last_press = millis();
     held = false;
-    red = Player{0, 0, 0, 0};
-    blue = Player{0, 0, 0, 0};
+    red = Player{0, 0, 0};
+    blue = Player{0, 0, 0};
 }
 
 BoardState Board::get_state() { return state; }
@@ -85,6 +85,39 @@ arduino::String Board::get_clock_time_string() {
     return arduino::String((std::to_string(time.time / 60000) + "+" + std::to_string(time.increment / 1000) + "|" + std::to_string(time.delay / 1000) + "d").c_str());
 }
 
+arduino::String Board::get_player_time(Player p) {
+    // single digit seconds we do tenth of second
+    // else print full 
+    unsigned int t = p.time_left;
+    unsigned short h = p.time_left / 3600000;
+    unsigned short m = (p.time_left - h * 3600000) / 60000;
+    unsigned short s = (p.time_left - h * 3600000 - m * 60000) / 1000;
+    unsigned short ds = (p.time_left - h * 360000 - m * 60000 - s * 1000) / 100;
+
+    std::string player_time = "";
+
+    if (h > 0) {
+        player_time.append(std::to_string(h) + ":");
+    }
+    if (m > 0) {
+        std::string min = std::to_string(m);
+        if (m < 10 && h > 0) {
+            min.insert(0, 1, '0');
+        }
+        player_time.append(min.append(":"));
+    }
+    std::string sec = std::to_string(s);
+    if ((h > 0 || m > 0) && s < 10) {
+        sec.insert(0, 1, '0');
+    }
+    player_time.append(sec);
+    if (h < 1 && m < 1) {
+        player_time.append("." + std::to_string(ds));
+    }
+
+    return arduino::String(player_time.c_str());
+}
+
 void Board::_next_preset(bool previous) {
     int preset_int = static_cast<int>(preset);
 
@@ -155,10 +188,11 @@ void Board::_inc_time(bool dec) {
 
 void Board::_start_game() {
     state = IN_GAME;
-
-    unsigned long start_time = millis();
-    red.start_time = start_time;
-    blue.start_time = start_time;
+    
+    red.time_left = time.time;
+    blue.time_left = time.time;
+    Serial.println(get_player_time(red));
+    Serial.println(time.time);
 }
 
 void Board::_toggle_custom_states() {

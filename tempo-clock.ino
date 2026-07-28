@@ -27,6 +27,8 @@ void setup() {
     pinMode(BUTTON_B_PIN, INPUT);
     pinMode(BUTTON_C_PIN, INPUT);
     pinMode(BUTTON_D_PIN, INPUT);
+
+    delay(1000);
 }
 
 void loop() {
