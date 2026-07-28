@@ -4,13 +4,17 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 
+const int BOARD_REFRESH_DELAY = 100;
+
 enum BoardState : int {
     MENU,
     CUSTOM_T,
     CUSTOM_I,
     CUSTOM_D,
+    WAITING,
     IN_GAME,
     PAUSED,
+    STOPPED,
     BLUE_WIN,
     RED_WIN,
 };

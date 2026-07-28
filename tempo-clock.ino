@@ -28,6 +28,7 @@ void setup() {
     pinMode(BUTTON_C_PIN, INPUT);
     pinMode(BUTTON_D_PIN, INPUT);
 
+    // loading screen timer
     delay(1000);
 }
 
@@ -35,5 +36,5 @@ void loop() {
     board.event_listener();
     display.render();
 
-    delay(100);
+    delay(BOARD_REFRESH_DELAY);
 }

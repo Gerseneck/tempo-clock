@@ -187,12 +187,10 @@ void Board::_inc_time(bool dec) {
 }
 
 void Board::_start_game() {
-    state = IN_GAME;
+    state = WAITING;
     
     red.time_left = time.time;
     blue.time_left = time.time;
-    Serial.println(get_player_time(red));
-    Serial.println(time.time);
 }
 
 void Board::_toggle_custom_states() {
