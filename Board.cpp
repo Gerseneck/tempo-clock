@@ -109,13 +109,11 @@ arduino::String Board::get_player_time(char player) {
     if (h > 0) {
         player_time.append(std::to_string(h) + ":");
     }
-    if (m > 0) {
-        std::string min = std::to_string(m);
-        if (m < 10 && h > 0) {
-            min.insert(0, 1, '0');
-        }
-        player_time.append(min.append(":"));
+    std::string min = std::to_string(m);
+    if (m < 10 && h > 0) {
+        min.insert(0, 1, '0');
     }
+    player_time.append(min.append(":"));
     std::string sec = std::to_string(s);
     if ((h > 0 || m > 0) && s < 10) {
         sec.insert(0, 1, '0');
@@ -295,12 +293,12 @@ void Board::_game_button_listener(int* presses) {
             _add_inc(&red);
         }
     }
-    if (presses[1]) {}
-    if (presses[2]) {
+    if (presses[1]) {
         state = PAUSED;
         red.is_turn = false;
         blue.is_turn = false;
     }
+    if (presses[2]) {}
     if (presses[3]) {
         if (red.is_turn == blue.is_turn) {
             red.is_turn = false;
