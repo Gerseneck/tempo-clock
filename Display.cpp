@@ -11,9 +11,12 @@ Display::Display(Board& board, LiquidCrystal& lcd) : board(board), lcd(lcd) {
 void Display::render() {
     if (board.get_state() != state) {
         // clear lcd when state changes and redraw
-        // TODO: clear screen when the size of text changes
         lcd.clear();
         state = board.get_state();
+    }
+    if (board.get_redraw_screen()) {
+        lcd.clear();
+        board.reset_redraw_screen();
     }
 
     switch (board.get_state()) {

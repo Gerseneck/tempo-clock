@@ -15,11 +15,15 @@ Board::Board() {
     red = Player{0, 0, 0, 0};
     blue = Player{0, 0, 0, 0};
     paused = false;
+    redraw_screen = false;
 }
 
 BoardState Board::get_state() { return state; }
 
 Preset Board::get_preset() { return preset; }
+
+bool Board::get_redraw_screen() { return redraw_screen; }
+void Board::reset_redraw_screen() { redraw_screen = false; }
 
 arduino::String Board::get_preset_string() {
     switch (preset) {
@@ -174,6 +178,7 @@ void Board::_button_listener() {
         if (millis() - 2000 > last_press) { held = true; }
 
         last_press = millis();
+        redraw_screen = true;
     } else {
         held = false;
         last_press = 0;
@@ -328,6 +333,11 @@ void Board::_game_event_listener() {
     if (p->time_left - BOARD_REFRESH_DELAY > p->time_left) {
         state = red.is_turn ? BLUE_WIN : RED_WIN;
         return;
+    }
+    
+    // redraw screen logic
+    if ((p->time_left - BOARD_REFRESH_DELAY) % 60000 > p->time_left % 60000) {
+        redraw_screen = true;
     }
 
     p->time_left -= BOARD_REFRESH_DELAY;

@@ -65,10 +65,15 @@ class Board {
         arduino::String get_preset_string();
         arduino::String get_player_time(char player);
         void set_state(BoardState state);
+        bool get_redraw_screen();
+        void reset_redraw_screen();
     private:
         BoardState state;
         ClockTime time;
         Preset preset;
+
+        // tell display redraw screen
+        bool redraw_screen;
 
         unsigned long last_press;
         bool held;
