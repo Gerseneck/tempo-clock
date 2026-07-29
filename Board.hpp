@@ -14,7 +14,7 @@ enum BoardState : int {
     WAITING,
     IN_GAME,
     PAUSED,
-    STOPPED,
+    STOPPED, // get screen to choose winner
     BLUE_WIN,
     RED_WIN,
 };
@@ -27,7 +27,8 @@ struct ClockTime {
 };
 
 struct Player {
-    unsigned long time_left;
+    unsigned int time_left;
+    unsigned int delay;
     bool is_turn;
     unsigned int turn_number;
 };
@@ -62,26 +63,35 @@ class Board {
         arduino::String get_clock_time_string();
         Preset get_preset();
         arduino::String get_preset_string();
-        arduino::String get_player_time(Player p);
+        arduino::String get_player_time(char player);
         void set_state(BoardState state);
     private:
         BoardState state;
         ClockTime time;
         Preset preset;
 
-        Player red;
-        Player blue;
-
         unsigned long last_press;
         bool held;
 
-        void _menu_event_listener(int* presses);
-        void _game_event_listener(int* presses);
-        void _win_event_listener(int* presses);
+        Player red;
+        Player blue;
+        bool paused;
+
+        // button listeners
+        void _button_listener();
+        void _menu_button_listener(int* presses);
+        void _wait_button_listener(int* presses);
+        void _game_button_listener(int* presses);
+        void _paused_button_listener(int* presses);
+        void _win_button_listener(int* presses);
+        // menu functions
         void _next_preset(bool previous);
         void _start_game();
         void _toggle_custom_states();
-        void _inc_time(bool dec);
+        void _inc_clock(bool dec);
+        // game functions
+        void _game_event_listener();
+        void _add_inc(Player *p);
 };
 
 #endif

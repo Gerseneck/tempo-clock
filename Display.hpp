@@ -14,7 +14,10 @@ class Display {
         Board& board;
         LiquidCrystal& lcd;
         BoardState state;
+
         void _render_menu();
+        void _render_wait();
+        void _render_game();
 };
 
 #endif

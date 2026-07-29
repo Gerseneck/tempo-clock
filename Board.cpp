@@ -2,6 +2,7 @@
 #include <LiquidCrystal.h>
 
 #include <set>
+#include <climits>
 
 #include "Board.hpp"
 
@@ -11,8 +12,9 @@ Board::Board() {
     time = get_clock_time();
     last_press = millis();
     held = false;
-    red = Player{0, 0, 0};
-    blue = Player{0, 0, 0};
+    red = Player{0, 0, 0, 0};
+    blue = Player{0, 0, 0, 0};
+    paused = false;
 }
 
 BoardState Board::get_state() { return state; }
@@ -85,14 +87,22 @@ arduino::String Board::get_clock_time_string() {
     return arduino::String((std::to_string(time.time / 60000) + "+" + std::to_string(time.increment / 1000) + "|" + std::to_string(time.delay / 1000) + "d").c_str());
 }
 
-arduino::String Board::get_player_time(Player p) {
+arduino::String Board::get_player_time(char player) {
     // single digit seconds we do tenth of second
     // else print full 
-    unsigned int t = p.time_left;
-    unsigned short h = p.time_left / 3600000;
-    unsigned short m = (p.time_left - h * 3600000) / 60000;
-    unsigned short s = (p.time_left - h * 3600000 - m * 60000) / 1000;
-    unsigned short ds = (p.time_left - h * 360000 - m * 60000 - s * 1000) / 100;
+    Player *p;
+    if (player == 'r') {
+        p = &red;
+    } 
+    if (player == 'b') {
+        p = &blue;
+    }
+
+    unsigned int t = p->time_left;
+    unsigned short h = p->time_left / 3600000;
+    unsigned short m = (p->time_left - h * 3600000) / 60000;
+    unsigned short s = (p->time_left - h * 3600000 - m * 60000) / 1000;
+    unsigned short ds = (p->time_left - h * 360000 - m * 60000 - s * 1000) / 100;
 
     std::string player_time = "";
 
@@ -136,6 +146,18 @@ void Board::_next_preset(bool previous) {
 }
 
 void Board::event_listener() {
+    switch (state) {
+        case IN_GAME:
+            _game_event_listener();
+            break;
+        default:
+            break;
+    }
+
+    _button_listener();
+}
+
+void Board::_button_listener() {
     int button_presses[4] = {
         digitalRead(BUTTON_A_PIN),
         digitalRead(BUTTON_B_PIN),
@@ -164,19 +186,22 @@ void Board::event_listener() {
         case CUSTOM_T:
         case CUSTOM_I:
         case CUSTOM_D:
-            _menu_event_listener(button_presses);
+            _menu_button_listener(button_presses);
             break;
+        case WAITING:
+            _wait_button_listener(button_presses);
         case IN_GAME:
-            _game_event_listener(button_presses);
+            _game_button_listener(button_presses);
             break;
         case PAUSED:
+            _paused_button_listener(button_presses);
         case BLUE_WIN:
         case RED_WIN:
-            _win_event_listener(button_presses);
+            _win_button_listener(button_presses);
     }
 }
 
-void Board::_inc_time(bool dec) {
+void Board::_inc_clock(bool dec) {
     if (state == CUSTOM_T) {
         time.time += dec ? -60000 : 60000;
     } else if (state == CUSTOM_I) {
@@ -191,6 +216,8 @@ void Board::_start_game() {
     
     red.time_left = time.time;
     blue.time_left = time.time;
+    red.delay = time.delay;
+    blue.delay = time.delay;
 }
 
 void Board::_toggle_custom_states() {
@@ -209,13 +236,13 @@ void Board::_toggle_custom_states() {
     }
 }
 
-void Board::_menu_event_listener(int* presses) {
+void Board::_menu_button_listener(int* presses) {
     if (presses[0]) { 
         if (state == MENU) {
             _next_preset(false);
             return;
         }
-        _inc_time(false);
+        _inc_clock(false);
     };
     if (presses[1]) {
         if (preset == CUSTOM) {
@@ -235,14 +262,84 @@ void Board::_menu_event_listener(int* presses) {
             _next_preset(true);
             return;
         }
-        _inc_time(true);
+        _inc_clock(true);
     };
 }
 
-void Board::_win_event_listener(int* presses) {
+
+void Board::_wait_button_listener(int* presses) {
+    if (presses[0] || presses[3]) {
+        state = IN_GAME;
+    } 
+    if (presses[2]) {
+        state = MENU;
+    }
+}
+
+void Board::_paused_button_listener(int* presses) {
+
+}
+
+void Board::_win_button_listener(int* presses) {
     
 }
 
-void Board::_game_event_listener(int* presses) {
-    
+void Board::_game_button_listener(int* presses) {
+    if (presses[0]) {
+        if (red.is_turn == blue.is_turn) {
+            red.is_turn = true;
+            blue.is_turn = false;
+        } else if (red.is_turn) {
+            red.is_turn = false;
+            blue.is_turn = true;
+            _add_inc(&red);
+        }
+    }
+    if (presses[1]) {}
+    if (presses[2]) {
+        state = PAUSED;
+        red.is_turn = false;
+        blue.is_turn = false;
+    }
+    if (presses[3]) {
+        if (red.is_turn == blue.is_turn) {
+            red.is_turn = false;
+            blue.is_turn = true;
+        } else if (blue.is_turn) {
+            red.is_turn = true;
+            blue.is_turn = false;
+            _add_inc(&blue);
+        }
+    }
+}
+
+void Board::_game_event_listener() {
+    Player *p;
+    if (red.is_turn) {
+        p = &red;
+    }
+    if (blue.is_turn) {
+        p = &blue;
+    }
+
+    if (p->delay != 0 && p->delay - BOARD_REFRESH_DELAY < p->delay) {
+        p->delay -= BOARD_REFRESH_DELAY;
+        return;
+    }
+
+    if (p->time_left - BOARD_REFRESH_DELAY > p->time_left) {
+        state = red.is_turn ? BLUE_WIN : RED_WIN;
+        return;
+    }
+
+    p->time_left -= BOARD_REFRESH_DELAY;
+}
+
+void Board::_add_inc(Player *p) {
+    if (p->time_left + time.increment < p->time_left) {
+        p->time_left = UINT_MAX;
+        return;
+    }
+
+    p->time_left += time.increment;
 }

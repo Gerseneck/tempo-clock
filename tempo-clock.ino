@@ -33,8 +33,8 @@ void setup() {
 }
 
 void loop() {
-    board.event_listener();
     display.render();
+    board.event_listener();
 
     delay(BOARD_REFRESH_DELAY);
 }

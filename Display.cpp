@@ -11,6 +11,7 @@ Display::Display(Board& board, LiquidCrystal& lcd) : board(board), lcd(lcd) {
 void Display::render() {
     if (board.get_state() != state) {
         // clear lcd when state changes and redraw
+        // TODO: clear screen when the size of text changes
         lcd.clear();
         state = board.get_state();
     }
@@ -22,6 +23,14 @@ void Display::render() {
         case CUSTOM_D:
             _render_menu();
             break;
+        case WAITING:
+            _render_wait();
+            break;
+        case IN_GAME:
+        case PAUSED:
+        case RED_WIN:
+        case BLUE_WIN:
+            _render_game();
     }
 }
 
@@ -50,4 +59,18 @@ void Display::_render_menu() {
         lcd.print(board.get_clock_time_string());
     }
     lcd.display();
+}
+
+void Display::_render_wait() {
+    lcd.setCursor(2, 0);
+    lcd.print("Press A/B to");
+    lcd.setCursor(5, 1);
+    lcd.print("start!");
+}
+
+void Display::_render_game() {
+    lcd.setCursor(1, 0);
+    lcd.print(board.get_player_time('r'));
+    lcd.setCursor(16 - board.get_player_time('b').length() - 1, 1);
+    lcd.print(board.get_player_time('b'));
 }
