@@ -9,8 +9,8 @@ Display::Display(Board& board, LiquidCrystal& lcd) : board(board), lcd(lcd) {
 }
 
 void Display::render() {
+    // clear lcd and redraw
     if (board.get_state() != state) {
-        // clear lcd when state changes and redraw
         lcd.clear();
         state = board.get_state();
     }
@@ -34,6 +34,9 @@ void Display::render() {
         case RED_WIN:
         case BLUE_WIN:
             _render_game();
+            break;
+        case STOPPED:
+            break;
     }
 }
 

@@ -28,31 +28,31 @@ void Board::reset_redraw_screen() { redraw_screen = false; }
 arduino::String Board::get_preset_string() {
     switch (preset) {
         case ONE_ZERO: 
-            return "1+0";
+            return arduino::String("1+0");
         case TWO_ZERO: 
-            return "2+0";
+            return arduino::String("2+0");
         case THREE_ZERO: 
-            return "3+0";
+            return arduino::String("3+0");
         case THREE_TWO: 
-            return "3+2";
+            return arduino::String("3+2");
         case FIVE_ZERO: 
-            return "5+0";
+            return arduino::String("5+0");
         case FIVE_THREE: 
-            return "5+3";
+            return arduino::String("5+3");
         case TEN_ZERO: 
-            return "10+0";
+            return arduino::String("10+0");
         case TEN_FIVE: 
-            return "10+5";
+            return arduino::String("10+5");
         case FIFTEEN_TEN: 
-            return "15+10";
+            return arduino::String("15+10");
         case THIRTY_ZERO: 
-            return "30+0";
+            return arduino::String("30+0");
         case THIRTY_TWENTY: 
-            return "30+20";
+            return arduino::String("30+20");
         case THIRTY_TWENTY_D: 
-            return "30|20d";
+            return arduino::String("30|20d");
         case CUSTOM:
-            return "Custom";
+            return arduino::String("Custom");
     };
 }
 
@@ -280,7 +280,14 @@ void Board::_wait_button_listener(int* presses) {
 }
 
 void Board::_paused_button_listener(int* presses) {
-
+    if (presses[1]) {
+        state = IN_GAME;
+    }
+    if (presses[2]) {
+        state = STOPPED;
+        red.is_turn = false;
+        blue.is_turn = false;
+    }
 }
 
 void Board::_win_button_listener(int* presses) {
@@ -300,10 +307,12 @@ void Board::_game_button_listener(int* presses) {
     }
     if (presses[1]) {
         state = PAUSED;
+    }
+    if (presses[2]) {
+        state = STOPPED;
         red.is_turn = false;
         blue.is_turn = false;
     }
-    if (presses[2]) {}
     if (presses[3]) {
         if (red.is_turn == blue.is_turn) {
             red.is_turn = false;
