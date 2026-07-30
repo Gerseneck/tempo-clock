@@ -80,7 +80,6 @@ class Board {
 
         Player red;
         Player blue;
-        bool paused;
 
         // button listeners
         void _button_listener();

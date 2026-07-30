@@ -14,7 +14,6 @@ Board::Board() {
     held = false;
     red = Player{0, 0, 0, 0};
     blue = Player{0, 0, 0, 0};
-    paused = false;
     redraw_screen = false;
 }
 
@@ -302,6 +301,7 @@ void Board::_game_button_listener(int* presses) {
         } else if (red.is_turn) {
             red.is_turn = false;
             blue.is_turn = true;
+            red.turn_number++;
             _add_inc(&red);
         }
     }
@@ -320,6 +320,7 @@ void Board::_game_button_listener(int* presses) {
         } else if (blue.is_turn) {
             red.is_turn = true;
             blue.is_turn = false;
+            blue.turn_number++;
             _add_inc(&blue);
         }
     }
@@ -344,7 +345,7 @@ void Board::_game_event_listener() {
         return;
     }
     
-    // redraw screen logic
+    // redraw screen logic (redraw every minute)
     if ((p->time_left - BOARD_REFRESH_DELAY) % 60000 > p->time_left % 60000) {
         redraw_screen = true;
     }
