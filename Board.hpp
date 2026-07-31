@@ -57,6 +57,7 @@ const int BUTTON_D_PIN = A2;
 class Board {
     public:
         Board();
+        void init();
 
         BoardState get_state();
 

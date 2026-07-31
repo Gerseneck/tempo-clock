@@ -4,8 +4,13 @@
 #include "Display.hpp"
 #include "Board.hpp"
 
-Display::Display(Board& board, LiquidCrystal& lcd) : board(board), lcd(lcd) {
+Display::Display(Board& board) : board(board), lcd(LCD_PIN_RS, LCD_PIN_ENABLE, LCD_PIN_D4, LCD_PIN_D5, LCD_PIN_D6, LCD_PIN_D7) {
     state = MENU;
+}
+
+void Display::init() {
+    lcd.begin(LCD_COLS, LCD_ROWS);
+    lcd.print("Tempo Clock");
 }
 
 void Display::render() {
