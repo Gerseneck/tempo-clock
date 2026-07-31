@@ -21,9 +21,6 @@ BoardState Board::get_state() { return state; }
 
 Preset Board::get_preset() { return preset; }
 
-bool Board::get_redraw_screen() { return redraw_screen; }
-void Board::reset_redraw_screen() { redraw_screen = false; }
-
 arduino::String Board::get_preset_string() {
     switch (preset) {
         case ONE_ZERO: 
@@ -131,22 +128,8 @@ arduino::String Board::get_player_time(char player) {
     return arduino::String(player_time.c_str());
 }
 
-void Board::_next_preset(bool previous) {
-    int preset_int = static_cast<int>(preset);
-
-    if (previous) {
-        preset_int--;
-
-        if (preset_int < ONE_ZERO) { return; }
-    } else {
-        preset_int++;
-
-        if (preset_int > CUSTOM) { return; }
-    }
-
-    preset = static_cast<Preset>(preset_int);
-    time = preset != CUSTOM ? get_clock_time() : ClockTime{0, 0, 0};
-}
+bool Board::get_redraw_screen() { return redraw_screen; }
+void Board::reset_redraw_screen() { redraw_screen = false; }
 
 void Board::event_listener() {
     switch (state) {
@@ -160,6 +143,8 @@ void Board::event_listener() {
     _button_listener();
 }
 
+// private helper methods
+// button listeners
 void Board::_button_listener() {
     int button_presses[4] = {
         digitalRead(BUTTON_A_PIN),
@@ -211,41 +196,6 @@ void Board::_button_listener() {
     }
 }
 
-void Board::_inc_clock(bool dec) {
-    if (state == CUSTOM_T) {
-        time.time += dec ? -60000 : 60000;
-    } else if (state == CUSTOM_I) {
-        time.increment += dec ? -1000 : 1000;
-    } else if (state == CUSTOM_D) {
-        time.delay += dec ? -1000 : 1000;
-    }
-}
-
-void Board::_start_game() {
-    state = WAITING;
-    
-    red.time_left = time.time;
-    blue.time_left = time.time;
-    red.delay = time.delay;
-    blue.delay = time.delay;
-}
-
-void Board::_toggle_custom_states() {
-    if (preset != CUSTOM) { return; }
-
-    if (state == MENU) {
-        state = CUSTOM_T;
-    } else if (state == CUSTOM_T) {
-        state = CUSTOM_I;
-    } else if (state == CUSTOM_I) {
-        state = CUSTOM_D;
-    } else if (state == CUSTOM_D) {
-        _start_game();
-    } else {
-        state = CUSTOM_T;
-    }
-}
-
 void Board::_menu_button_listener(int* presses) {
     if (presses[0]) { 
         if (state == MENU) {
@@ -292,23 +242,6 @@ void Board::_wait_button_listener(int* presses) {
     }
 }
 
-void Board::_paused_button_listener(int* presses) {
-    if (presses[1]) {
-        state = IN_GAME;
-    }
-    if (presses[2]) {
-        state = STOPPED;
-    }
-}
-
-void Board::_win_button_listener(bool key_pressed) {
-    if (!key_pressed) {
-        return;
-    }
-
-    state = MENU;
-}
-
 void Board::_game_button_listener(int* presses) {
     if (presses[0]) {
         if (red.is_turn) {
@@ -334,6 +267,15 @@ void Board::_game_button_listener(int* presses) {
     }
 }
 
+void Board::_paused_button_listener(int* presses) {
+    if (presses[1]) {
+        state = IN_GAME;
+    }
+    if (presses[2]) {
+        state = STOPPED;
+    }
+}
+
 void Board::_stopped_button_listener(int* presses) {
     if (presses[0]) {
         state = RED_WIN;
@@ -348,6 +290,68 @@ void Board::_stopped_button_listener(int* presses) {
     }
 }
 
+void Board::_win_button_listener(bool key_pressed) {
+    if (!key_pressed) {
+        return;
+    }
+
+    state = MENU;
+}
+
+// menu methods
+void Board::_next_preset(bool previous) {
+    int preset_int = static_cast<int>(preset);
+
+    if (previous) {
+        preset_int--;
+
+        if (preset_int < ONE_ZERO) { return; }
+    } else {
+        preset_int++;
+
+        if (preset_int > CUSTOM) { return; }
+    }
+
+    preset = static_cast<Preset>(preset_int);
+    time = preset != CUSTOM ? get_clock_time() : ClockTime{0, 0, 0};
+}
+
+void Board::_start_game() {
+    state = WAITING;
+    
+    red.time_left = time.time;
+    blue.time_left = time.time;
+    red.delay = time.delay;
+    blue.delay = time.delay;
+}
+
+void Board::_toggle_custom_states() {
+    if (preset != CUSTOM) { return; }
+
+    if (state == MENU) {
+        state = CUSTOM_T;
+    } else if (state == CUSTOM_T) {
+        state = CUSTOM_I;
+    } else if (state == CUSTOM_I) {
+        state = CUSTOM_D;
+    } else if (state == CUSTOM_D) {
+        _start_game();
+    } else {
+        state = CUSTOM_T;
+    }
+}
+
+void Board::_inc_clock(bool dec) {
+    if (state == CUSTOM_T) {
+        time.time += dec ? -60000 : 60000;
+    } else if (state == CUSTOM_I) {
+        time.increment += dec ? -1000 : 1000;
+    } else if (state == CUSTOM_D) {
+        time.delay += dec ? -1000 : 1000;
+    }
+}
+
+// game methods
 void Board::_game_event_listener() {
     Player *p;
     if (red.is_turn) {
@@ -383,5 +387,3 @@ void Board::_add_inc(Player *p) {
 
     p->time_left += time.increment;
 }
-
-

@@ -57,16 +57,21 @@ const int BUTTON_D_PIN = A2;
 class Board {
     public:
         Board();
-        void event_listener();
+
         BoardState get_state();
-        ClockTime get_clock_time();
-        arduino::String get_clock_time_string();
+
         Preset get_preset();
         arduino::String get_preset_string();
+
+        ClockTime get_clock_time();
+        arduino::String get_clock_time_string();
+
         arduino::String get_player_time(char player);
-        void set_state(BoardState state);
+
         bool get_redraw_screen();
         void reset_redraw_screen();
+
+        void event_listener();
     private:
         BoardState state;
         ClockTime time;
@@ -89,12 +94,14 @@ class Board {
         void _paused_button_listener(int* presses);
         void _stopped_button_listener(int* presses);
         void _win_button_listener(bool key_pressed);
-        // menu functions
+
+        // menu methods
         void _next_preset(bool previous);
         void _start_game();
         void _toggle_custom_states();
         void _inc_clock(bool dec);
-        // game functions
+
+        // game methods
         void _game_event_listener();
         void _add_inc(Player *p);
 };
