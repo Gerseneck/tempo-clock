@@ -17,7 +17,9 @@ class Display {
 
         void _render_menu();
         void _render_wait();
-        void _render_game();
+        void _render_time();
+        void _render_winner();
+        void _render_stopped();
 };
 
 #endif

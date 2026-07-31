@@ -87,7 +87,8 @@ class Board {
         void _wait_button_listener(int* presses);
         void _game_button_listener(int* presses);
         void _paused_button_listener(int* presses);
-        void _win_button_listener(int* presses);
+        void _stopped_button_listener(int* presses);
+        void _win_button_listener(bool key_pressed);
         // menu functions
         void _next_preset(bool previous);
         void _start_game();

@@ -31,11 +31,15 @@ void Display::render() {
             break;
         case IN_GAME:
         case PAUSED:
-        case RED_WIN:
-        case BLUE_WIN:
-            _render_game();
+            _render_time();
             break;
         case STOPPED:
+            _render_stopped();
+            break;
+        case RED_WIN:
+        case BLUE_WIN:
+            _render_time();
+            _render_winner();
             break;
     }
 }
@@ -74,9 +78,25 @@ void Display::_render_wait() {
     lcd.print("start!");
 }
 
-void Display::_render_game() {
-    lcd.setCursor(1, 0);
+void Display::_render_time() {
+    lcd.setCursor(2, 0);
     lcd.print(board.get_player_time('r'));
-    lcd.setCursor(16 - board.get_player_time('b').length() - 1, 1);
+    lcd.setCursor(16 - board.get_player_time('b').length() - 2, 1);
     lcd.print(board.get_player_time('b'));
+}
+
+void Display::_render_winner() {
+    if (board.get_state() == RED_WIN) {
+        lcd.setCursor(0, 0);
+    } else if (board.get_state() == BLUE_WIN) {
+        lcd.setCursor(15, 1);
+    }
+    lcd.write('W');
+}
+
+void Display::_render_stopped() {
+    lcd.setCursor(2, 0);
+    lcd.print("Press A/B to");
+    lcd.setCursor(1, 1);
+    lcd.print("select winner!");
 }

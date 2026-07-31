@@ -112,11 +112,13 @@ arduino::String Board::get_player_time(char player) {
     if (h > 0) {
         player_time.append(std::to_string(h) + ":");
     }
-    std::string min = std::to_string(m);
-    if (m < 10 && h > 0) {
-        min.insert(0, 1, '0');
+    if (m > 0 || h > 0) {
+        std::string min = std::to_string(m);
+        if (m < 10 && h > 0) {
+            min.insert(0, 1, '0');
+        }
+        player_time.append(min.append(":"));
     }
-    player_time.append(min.append(":"));
     std::string sec = std::to_string(s);
     if ((h > 0 || m > 0) && s < 10) {
         sec.insert(0, 1, '0');
@@ -192,14 +194,20 @@ void Board::_button_listener() {
             break;
         case WAITING:
             _wait_button_listener(button_presses);
+            break;
         case IN_GAME:
             _game_button_listener(button_presses);
             break;
         case PAUSED:
             _paused_button_listener(button_presses);
+            break;
+        case STOPPED:
+            _stopped_button_listener(button_presses);
+            break;
         case BLUE_WIN:
         case RED_WIN:
-            _win_button_listener(button_presses);
+            _win_button_listener(pressed);
+            break;
     }
 }
 
@@ -270,9 +278,15 @@ void Board::_menu_button_listener(int* presses) {
 
 
 void Board::_wait_button_listener(int* presses) {
-    if (presses[0] || presses[3]) {
+    if (presses[0]) {
         state = IN_GAME;
-    } 
+        red.is_turn = true;
+        blue.is_turn = false;
+    } else if (presses[3]) {
+        state = IN_GAME;
+        red.is_turn = false;
+        blue.is_turn = true;
+    }
     if (presses[2]) {
         state = MENU;
     }
@@ -284,21 +298,20 @@ void Board::_paused_button_listener(int* presses) {
     }
     if (presses[2]) {
         state = STOPPED;
-        red.is_turn = false;
-        blue.is_turn = false;
     }
 }
 
-void Board::_win_button_listener(int* presses) {
-    
+void Board::_win_button_listener(bool key_pressed) {
+    if (!key_pressed) {
+        return;
+    }
+
+    state = MENU;
 }
 
 void Board::_game_button_listener(int* presses) {
     if (presses[0]) {
-        if (red.is_turn == blue.is_turn) {
-            red.is_turn = true;
-            blue.is_turn = false;
-        } else if (red.is_turn) {
+        if (red.is_turn) {
             red.is_turn = false;
             blue.is_turn = true;
             red.turn_number++;
@@ -310,19 +323,28 @@ void Board::_game_button_listener(int* presses) {
     }
     if (presses[2]) {
         state = STOPPED;
-        red.is_turn = false;
-        blue.is_turn = false;
     }
     if (presses[3]) {
-        if (red.is_turn == blue.is_turn) {
-            red.is_turn = false;
-            blue.is_turn = true;
-        } else if (blue.is_turn) {
+        if (blue.is_turn) {
             red.is_turn = true;
             blue.is_turn = false;
             blue.turn_number++;
             _add_inc(&blue);
         }
+    }
+}
+
+void Board::_stopped_button_listener(int* presses) {
+    if (presses[0]) {
+        state = RED_WIN;
+    } else if (presses[3]) {
+        state = BLUE_WIN;
+    }
+    if (presses[1]) {
+        state = IN_GAME;
+    }
+    if (presses[2]) {
+        state = PAUSED;
     }
 }
 
@@ -361,3 +383,5 @@ void Board::_add_inc(Player *p) {
 
     p->time_left += time.increment;
 }
+
+
