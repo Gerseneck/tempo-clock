@@ -1,8 +1,8 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
+#include "Logger.hpp"
 #include <Arduino.h>
-#include <LiquidCrystal.h>
 
 const int BOARD_REFRESH_DELAY = 100;
 
@@ -56,7 +56,7 @@ const int BUTTON_D_PIN = A2;
 
 class Board {
     public:
-        Board();
+        Board(Logger& logger);
         void init();
 
         BoardState get_state();
@@ -74,6 +74,8 @@ class Board {
 
         void event_listener();
     private:
+        Logger& logger;
+
         BoardState state;
         ClockTime time;
         Preset preset;

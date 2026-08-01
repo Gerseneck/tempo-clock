@@ -5,8 +5,9 @@
 #include <climits>
 
 #include "Board.hpp"
+#include "Logger.hpp"
 
-Board::Board() {
+Board::Board(Logger& logger) : logger(logger) {
     state = MENU;
     preset = ONE_ZERO;
     time = get_clock_time();
@@ -239,10 +240,12 @@ void Board::_wait_button_listener(int* presses) {
         state = IN_GAME;
         red.is_turn = true;
         blue.is_turn = false;
+        logger.log("Red Start!");
     } else if (presses[3]) {
         state = IN_GAME;
         red.is_turn = false;
         blue.is_turn = true;
+        logger.log("Blue Start!");
     }
     if (presses[2]) {
         state = MENU;
@@ -256,10 +259,15 @@ void Board::_game_button_listener(int* presses) {
             blue.is_turn = true;
             red.turn_number++;
             _add_inc(&red);
+
+            logger.log("Red Time Left: " + std::string(get_player_time('r').c_str()));
+            logger.log("Blue's Turn!");
         }
     }
     if (presses[1]) {
         state = PAUSED;
+
+        logger.log("Game Paused");
     }
     if (presses[2]) {
         state = STOPPED;
@@ -270,6 +278,9 @@ void Board::_game_button_listener(int* presses) {
             blue.is_turn = false;
             blue.turn_number++;
             _add_inc(&blue);
+
+            logger.log("Blue Time Left: " + std::string(get_player_time('b').c_str()));
+            logger.log("Reds's Turn!");
         }
     }
 }
@@ -280,20 +291,30 @@ void Board::_paused_button_listener(int* presses) {
     }
     if (presses[2]) {
         state = STOPPED;
+
+        logger.log("Game Stopped");
     }
 }
 
 void Board::_stopped_button_listener(int* presses) {
     if (presses[0]) {
         state = RED_WIN;
+
+        logger.log("Red Wins!");
     } else if (presses[3]) {
         state = BLUE_WIN;
+
+        logger.log("Blue Wins!");
     }
     if (presses[1]) {
         state = IN_GAME;
+
+        logger.log("Game Unpaused");
     }
     if (presses[2]) {
         state = PAUSED;
+
+        logger.log("Game Paused");
     }
 }
 
@@ -330,6 +351,9 @@ void Board::_start_game() {
     blue.time_left = time.time;
     red.delay = time.delay;
     blue.delay = time.delay;
+
+    logger.log("Preset Chosen: " + std::string(get_preset_string().c_str()));
+    logger.log("Clock Time Chosen: " + std::string(get_clock_time_string().c_str()));
 }
 
 void Board::_toggle_custom_states() {
@@ -375,6 +399,7 @@ void Board::_game_event_listener() {
 
     if (p->time_left - BOARD_REFRESH_DELAY > p->time_left) {
         state = red.is_turn ? BLUE_WIN : RED_WIN;
+        logger.log(std::string(red.is_turn ? "Blue" : "Red") + " Wins!");
         return;
     }
     

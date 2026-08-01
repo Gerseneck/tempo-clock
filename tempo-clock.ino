@@ -3,16 +3,19 @@
 #include <LiquidCrystal.h>
 
 #include "Board.hpp"
+#include "Logger.hpp"
 #include "Display.hpp"
 
-Board board;
+Logger logger;
+Board board(logger);
 Display display(board);
 
 void setup() {
-    Serial.begin(9600);
-
+    logger.init();
     board.init();
+    logger.log("Board Ready!");
     display.init();
+    logger.log("Display Ready!");
 
     // loading screen timer
     delay(1000);
