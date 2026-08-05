@@ -3,6 +3,7 @@
 #include <LiquidCrystal.h>
 
 #include "Board.hpp"
+#include "Data.hpp"
 #include "Logger.hpp"
 #include "Display.hpp"
 
