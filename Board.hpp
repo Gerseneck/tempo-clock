@@ -5,6 +5,7 @@
 #include <Arduino.h>
 
 const int BOARD_REFRESH_DELAY = 100;
+const int BUZZER_PIN = 8;
 
 enum BoardState : int {
     MENU,

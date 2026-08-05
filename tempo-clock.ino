@@ -17,6 +17,10 @@ void setup() {
     display.init();
     logger.log("Display Ready!");
 
+    logger.log("==================");
+    logger.log("TEMPO CLOCK v1.0.0");
+    logger.log("==================");
+
     // loading screen timer
     delay(1000);
 }

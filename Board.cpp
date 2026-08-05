@@ -398,6 +398,7 @@ void Board::_game_event_listener() {
     }
 
     if (p->time_left - BOARD_REFRESH_DELAY > p->time_left) {
+        tone(BUZZER_PIN, 440, 1500);
         state = red.is_turn ? BLUE_WIN : RED_WIN;
         logger.log(std::string(red.is_turn ? "Blue" : "Red") + " Wins!");
         return;
